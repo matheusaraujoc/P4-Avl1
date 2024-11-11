@@ -37,6 +37,11 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
     }
   }
 
+  // Recarregar tarefas após retornar da tela de categorias
+  Future<void> _recarregarTarefas() async {
+    await _loadTarefas();
+  }
+
   // Carregar tarefas finalizadas do SharedPreferences
   Future<void> _loadTarefasFinalizadas() async {
     final prefs = await SharedPreferences.getInstance();
@@ -317,18 +322,19 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
           FloatingActionButtonLocation.endFloat, // Aqui está o ajuste
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0, // Para indicar que estamos na tela de Tarefas
-        onTap: (int index) {
+        onTap: (int index) async {
           if (index == 0) {
             // Mantém na tela de Tarefas
             return;
           } else if (index == 1) {
             // Navega para a tela de Categorias
-            Navigator.push(
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => TelaCategorias(),
               ),
             );
+            await _recarregarTarefas(); // Recarrega tarefas após voltar
           }
         },
         items: const [

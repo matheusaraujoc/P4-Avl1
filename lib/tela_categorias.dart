@@ -34,12 +34,12 @@ class _TelaCategoriasState extends State<TelaCategorias> {
   }
 
   Future<void> _removerCategorias() async {
-    // Remove categorias selecionadas da lista de categorias
+    // Remove as categorias selecionadas da lista de categorias
     categorias
         .removeWhere((categoria) => categoriasSelecionadas.contains(categoria));
     await prefs.setStringList('categorias', categorias);
 
-    // Remover tarefas associadas às categorias selecionadas
+    // Remove as tarefas associadas às categorias selecionadas
     await _removerTarefasPorCategoriasSelecionadas();
 
     setState(() {
@@ -49,18 +49,19 @@ class _TelaCategoriasState extends State<TelaCategorias> {
   }
 
   Future<void> _removerTarefasPorCategoriasSelecionadas() async {
-    // Carregar tarefas do SharedPreferences
+    // Carrega as tarefas do SharedPreferences
     final String? tarefasJson = prefs.getString('tarefas');
     if (tarefasJson != null) {
       final List<dynamic> tarefasList = jsonDecode(tarefasJson);
-      // Filtrar para manter apenas tarefas que não estão nas categorias selecionadas
+
+      // Filtra para manter apenas tarefas que não estão nas categorias selecionadas
       final List<Map<String, dynamic>> tarefasFiltradas = tarefasList
           .map((tarefa) => Map<String, dynamic>.from(tarefa))
           .where(
               (tarefa) => !categoriasSelecionadas.contains(tarefa['categoria']))
           .toList();
 
-      // Salvar tarefas filtradas de volta no SharedPreferences
+      // Salva as tarefas filtradas de volta no SharedPreferences
       await prefs.setString('tarefas', jsonEncode(tarefasFiltradas));
     }
   }

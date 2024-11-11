@@ -47,8 +47,16 @@ class _TelaNovaTarefaState extends State<TelaNovaTarefa> {
   }
 
   void selecionarHorario(BuildContext context) async {
-    final novoHorario =
-        await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    final novoHorario = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
+    );
     if (novoHorario != null) setState(() => horario = novoHorario);
   }
 
