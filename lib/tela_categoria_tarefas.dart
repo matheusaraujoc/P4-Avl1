@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert'; // Para manipulação de JSON
+import 'dart:convert';
 
 class TelaCategoriaTarefas extends StatefulWidget {
   final String categoria;
@@ -30,9 +30,7 @@ class _TelaCategoriaTarefasState extends State<TelaCategoriaTarefas> {
         tarefas = tarefasList
             .map((tarefa) => Map<String, dynamic>.from(tarefa))
             .toList()
-            .where((tarefa) =>
-                tarefa['categoria'] ==
-                widget.categoria) // Filtro pela categoria
+            .where((tarefa) => tarefa['categoria'] == widget.categoria)
             .toList();
       });
     }
@@ -43,10 +41,15 @@ class _TelaCategoriaTarefasState extends State<TelaCategoriaTarefas> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Tarefas - ${widget.categoria}"),
-        backgroundColor: const Color.fromARGB(255, 148, 132, 214),
+        backgroundColor: Colors.lightBlueAccent,
       ),
       body: tarefas.isEmpty
-          ? Center(child: Text("Nenhuma tarefa encontrada para essa categoria"))
+          ? Center(
+              child: Text(
+                "Nenhuma tarefa encontrada para essa categoria",
+                style: TextStyle(color: Colors.blueGrey),
+              ),
+            )
           : ListView.builder(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -57,19 +60,25 @@ class _TelaCategoriaTarefasState extends State<TelaCategoriaTarefas> {
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 190, 174, 255),
+                      color: Colors.blue[100],
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.grey),
+                      border: Border.all(color: Colors.blueAccent),
                     ),
                     child: ListTile(
                       title: Text(
                         tarefa['titulo'],
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue[800],
+                        ),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(tarefa['descricao']),
+                          Text(
+                            tarefa['descricao'],
+                            style: TextStyle(color: Colors.blue[600]),
+                          ),
                           SizedBox(height: 5),
                           Text(
                             "Dias: ${tarefa['dias'].join(", ")}",
@@ -86,7 +95,10 @@ class _TelaCategoriaTarefasState extends State<TelaCategoriaTarefas> {
                       trailing: Text(
                         tarefa['horario'] ?? '',
                         style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue[800],
+                        ),
                       ),
                     ),
                   ),

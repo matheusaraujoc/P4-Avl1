@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_local.dart'; // Importando para inicializar o locale
-import 'package:shared_preferences/shared_preferences.dart'; // Importando SharedPreferences
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'tela_lista_tarefas.dart';
 
 Future<void> inicializarCategorias() async {
   final prefs = await SharedPreferences.getInstance();
   List<String> savedCategorias = prefs.getStringList('categorias') ?? [];
 
-  // Verificar se é a primeira vez ou se não há categorias
   if (savedCategorias.isEmpty) {
     savedCategorias = ['Trabalho', 'Pessoal', 'Lista de Desejos'];
     await prefs.setStringList('categorias', savedCategorias);
@@ -16,14 +15,11 @@ Future<void> inicializarCategorias() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting(
-      'pt_BR', null); // Inicializando o locale para 'pt_BR'
+  await initializeDateFormatting('pt_BR', null);
 
-  // Verificar se é a primeira vez que o app é aberto
   final prefs = await SharedPreferences.getInstance();
   final bool isFirstTime = prefs.getBool('isFirstTime') ?? true;
 
-  // Inicializa as categorias apenas na primeira vez
   if (isFirstTime) {
     await inicializarCategorias();
   }
@@ -41,7 +37,7 @@ class AppDeTarefas extends StatelessWidget {
     return MaterialApp(
       title: 'App de Tarefas',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.purple),
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: isFirstTime ? TelaBoasVindas() : TelaListaTarefas(),
     );
   }
@@ -59,24 +55,26 @@ class TelaBoasVindas extends StatelessWidget {
             Text(
               "Bem-Vindo",
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent),
             ),
             Text(
               "Vamos começar!",
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 18, color: Colors.grey[700]),
             ),
             SizedBox(height: 20),
             Image.asset(
-              'assets/images/iniciar_image.png', // Caminho para a imagem
-              height: 270, // Ajuste da altura da imagem
+              'assets/images/iniciar_image.png',
+              height: 270,
             ),
-            SizedBox(height: 40), // Espaço extra entre a imagem e o botão
+            SizedBox(height: 40),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 50.0),
               child: ElevatedButton(
                 onPressed: () async {
-                  // Salvar que o app não é mais aberto pela primeira vez
                   final prefs = await SharedPreferences.getInstance();
                   await prefs.setBool('isFirstTime', false);
 
@@ -86,10 +84,17 @@ class TelaBoasVindas extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  fixedSize: Size(180, 50), // Largura de 180 e altura de 50
-                  textStyle: TextStyle(fontSize: 18), // Tamanho da fonte
+                  backgroundColor: Colors.lightBlueAccent, // Cor azul claro
+                  fixedSize: Size(
+                      180, 50), // Tamanho fixo para evitar redimensionamento
+                  textStyle:
+                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(10), // Bordas arredondadas
+                  ),
                 ),
-                child: Text("INICIAR"),
+                child: Text("INICIAR", style: TextStyle(color: Colors.white)),
               ),
             ),
           ],

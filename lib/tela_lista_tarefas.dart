@@ -3,9 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'tela_nova_tarefa.dart';
 import 'tarefas_finalizadas.dart';
-import 'dart:convert'; // Para converter objetos em JSON
-import 'package:flutter/services.dart'; // Importar para usar SystemNavigator.pop()
-import 'tela_categorias.dart'; // Importe a tela de Categorias
+import 'dart:convert';
+import 'package:flutter/services.dart';
+import 'tela_categorias.dart';
 
 class TelaListaTarefas extends StatefulWidget {
   @override
@@ -23,7 +23,6 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
     _loadTarefasFinalizadas();
   }
 
-  // Carregar tarefas do SharedPreferences
   Future<void> _loadTarefas() async {
     final prefs = await SharedPreferences.getInstance();
     final String? tarefasJson = prefs.getString('tarefas');
@@ -37,12 +36,6 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
     }
   }
 
-  // Recarregar tarefas após retornar da tela de categorias
-  Future<void> _recarregarTarefas() async {
-    await _loadTarefas();
-  }
-
-  // Carregar tarefas finalizadas do SharedPreferences
   Future<void> _loadTarefasFinalizadas() async {
     final prefs = await SharedPreferences.getInstance();
     final String? tarefasFinalizadasJson =
@@ -57,14 +50,12 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
     }
   }
 
-  // Salvar tarefas no SharedPreferences
   Future<void> _saveTarefas() async {
     final prefs = await SharedPreferences.getInstance();
     final String tarefasJson = jsonEncode(tarefas);
     await prefs.setString('tarefas', tarefasJson);
   }
 
-  // Salvar tarefas finalizadas no SharedPreferences
   Future<void> _saveTarefasFinalizadas() async {
     final prefs = await SharedPreferences.getInstance();
     final String tarefasFinalizadasJson = jsonEncode(tarefasFinalizadas);
@@ -78,21 +69,6 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
     _saveTarefas();
   }
 
-  void atualizarTarefa(int index, Map<String, dynamic> tarefaAtualizada) {
-    setState(() {
-      tarefas[index] = tarefaAtualizada;
-    });
-    _saveTarefas();
-  }
-
-  // Função para remover a tarefa finalizada
-  void removerTarefa(Map<String, dynamic> tarefa) {
-    setState(() {
-      tarefasFinalizadas.remove(tarefa); // Remove a tarefa de finalizadas
-    });
-    _saveTarefasFinalizadas();
-  }
-
   void finalizarTarefa(int index) {
     setState(() {
       tarefasFinalizadas.add(tarefas[index]);
@@ -104,8 +80,8 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
 
   void restaurarTarefa(Map<String, dynamic> tarefa) {
     setState(() {
-      tarefas.add(tarefa); // Adiciona a tarefa de volta às tarefas ativas
-      tarefasFinalizadas.remove(tarefa); // Remove a tarefa das finalizadas
+      tarefas.add(tarefa);
+      tarefasFinalizadas.remove(tarefa);
     });
     _saveTarefas();
     _saveTarefasFinalizadas();
@@ -114,59 +90,52 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
   void _mostrarDialogoDeEdicaoOuRemocao(int index) {
     showDialog(
       context: context,
-      barrierDismissible: true, // Permite fechar o diálogo clicando fora
+      barrierDismissible: true,
       builder: (context) {
         return Dialog(
-          backgroundColor: Colors.transparent, // Fundo transparente
-          child: GestureDetector(
-            onTap: () {}, // Impede que o fundo do diálogo feche
-            child: Center(
-              child: Material(
-                color: Colors.transparent, // Fundo do Material transparente
-                child: AlertDialog(
-                  title: Text("O que você deseja fazer?"),
-                  actions: [
-                    TextButton(
-                      onPressed: () async {
-                        Navigator.pop(context); // Fecha o diálogo imediatamente
-                        // Editar tarefa
-                        final tarefaEditada = await Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            opaque: false, // Faz o fundo transparente
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) {
-                              return TelaNovaTarefa(tarefa: tarefas[index]);
-                            },
-                          ),
-                        );
-
-                        // Verificar se a tarefa foi editada e atualizar a lista
-                        if (tarefaEditada != null) {
-                          setState(() {
-                            tarefas[index] =
-                                tarefaEditada; // Atualiza a tarefa no índice
-                          });
-                          _saveTarefas();
-                        }
-                      },
-                      child: Text("Editar"),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context); // Fecha o diálogo imediatamente
-                        // Apagar tarefa
-                        setState(() {
-                          tarefas.removeAt(index); // Remove a tarefa
-                        });
-                        _saveTarefas();
-                      },
-                      child: Text("Apagar"),
-                    ),
-                  ],
-                ),
-              ),
+          backgroundColor: Colors.transparent, // Remove o fundo branco extra
+          child: AlertDialog(
+            backgroundColor: Colors
+                .white, // Mantém o fundo branco apenas do próprio AlertDialog
+            title: Text(
+              "O que você deseja fazer?",
+              style: TextStyle(color: Colors.lightBlueAccent),
             ),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  final tarefaEditada = await Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      opaque: false,
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return TelaNovaTarefa(tarefa: tarefas[index]);
+                      },
+                    ),
+                  );
+                  if (tarefaEditada != null) {
+                    setState(() {
+                      tarefas[index] = tarefaEditada;
+                    });
+                    _saveTarefas();
+                  }
+                },
+                child: Text("Editar",
+                    style: TextStyle(color: Colors.lightBlueAccent)),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    tarefas.removeAt(index);
+                  });
+                  _saveTarefas();
+                },
+                child:
+                    Text("Apagar", style: TextStyle(color: Colors.redAccent)),
+              ),
+            ],
           ),
         );
       },
@@ -181,7 +150,7 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Lista de Tarefas"),
-        backgroundColor: const Color.fromARGB(255, 148, 132, 214),
+        backgroundColor: Colors.lightBlueAccent,
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -193,12 +162,17 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
                       tarefas: tarefas,
                       tarefasFinalizadas: tarefasFinalizadas,
                       restaurarTarefa: restaurarTarefa,
-                      removerTarefa: removerTarefa,
+                      removerTarefa: (tarefa) {
+                        setState(() {
+                          tarefasFinalizadas.remove(tarefa);
+                        });
+                        _saveTarefasFinalizadas();
+                      },
                     ),
                   ),
                 );
               } else if (value == 'sair') {
-                SystemNavigator.pop(); // Fecha o aplicativo
+                SystemNavigator.pop();
               }
             },
             itemBuilder: (context) => [
@@ -218,8 +192,7 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -228,20 +201,23 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: Colors.lightBlueAccent,
                   ),
                 ),
                 SizedBox(height: 8),
                 Text(
                   "Aqui estão suas tarefas",
-                  style: TextStyle(fontSize: 14, color: Colors.black54),
+                  style: TextStyle(fontSize: 14, color: Colors.blueGrey),
                 ),
               ],
             ),
           ),
           Expanded(
             child: tarefas.isEmpty
-                ? Center(child: Text("Nenhuma tarefa adicionada"))
+                ? Center(
+                    child: Text("Nenhuma tarefa adicionada",
+                        style: TextStyle(color: Colors.blueGrey)),
+                  )
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
@@ -252,29 +228,32 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
                         padding: const EdgeInsets.only(bottom: 8.0),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 190, 174, 255),
+                            color: Colors.lightBlue[50],
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.grey),
+                            border: Border.all(color: Colors.lightBlueAccent),
                           ),
                           child: ListTile(
                             title: Text(
                               tarefa['titulo'],
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.lightBlueAccent),
                             ),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(tarefa['descricao']),
+                                Text(tarefa['descricao'],
+                                    style: TextStyle(color: Colors.blueGrey)),
                                 SizedBox(height: 5),
                                 Text(
                                   "Dias: ${tarefa['dias'].join(", ")}",
                                   style: TextStyle(
-                                      fontSize: 12, color: Colors.black54),
+                                      fontSize: 12, color: Colors.blueGrey),
                                 ),
                                 Text(
                                   "Categoria: ${tarefa['categoria']}",
                                   style: TextStyle(
-                                      fontSize: 12, color: Colors.black54),
+                                      fontSize: 12, color: Colors.blueGrey),
                                 ),
                               ],
                             ),
@@ -285,11 +264,13 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
                                   tarefa['horario'] ?? '',
                                   style: TextStyle(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.bold),
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.lightBlueAccent),
                                 ),
                                 SizedBox(width: 8),
                                 IconButton(
-                                  icon: Icon(Icons.check_circle_outline),
+                                  icon: Icon(Icons.check_circle_outline,
+                                      color: Colors.lightBlueAccent),
                                   onPressed: () {
                                     finalizarTarefa(index);
                                   },
@@ -309,7 +290,8 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        backgroundColor: Colors.lightBlueAccent,
+        child: Icon(Icons.add, color: Colors.white),
         onPressed: () async {
           final novaTarefa = await showDialog<Map<String, dynamic>>(
             context: context,
@@ -318,25 +300,23 @@ class _TelaListaTarefasState extends State<TelaListaTarefas> {
           if (novaTarefa != null) adicionarTarefa(novaTarefa);
         },
       ),
-      floatingActionButtonLocation:
-          FloatingActionButtonLocation.endFloat, // Aqui está o ajuste
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0, // Para indicar que estamos na tela de Tarefas
+        currentIndex: 0,
         onTap: (int index) async {
-          if (index == 0) {
-            // Mantém na tela de Tarefas
-            return;
-          } else if (index == 1) {
-            // Navega para a tela de Categorias
+          if (index == 1) {
             await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => TelaCategorias(),
               ),
             );
-            await _recarregarTarefas(); // Recarrega tarefas após voltar
+            await _loadTarefas();
           }
         },
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.lightBlueAccent,
+        unselectedItemColor: Colors.blueGrey,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.check_box),

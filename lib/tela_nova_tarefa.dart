@@ -53,7 +53,15 @@ class _TelaNovaTarefaState extends State<TelaNovaTarefa> {
       builder: (BuildContext context, Widget? child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child!,
+          child: Theme(
+            data: ThemeData(
+              colorScheme: ColorScheme.light(
+                primary: Colors.lightBlueAccent, // Cor do relógio
+                onSurface: Colors.blueAccent, // Cor do texto do relógio
+              ),
+            ),
+            child: child!,
+          ),
         );
       },
     );
@@ -69,12 +77,14 @@ class _TelaNovaTarefaState extends State<TelaNovaTarefa> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Categorias"),
-            content: Text("Nenhuma categoria disponível."),
+            backgroundColor: Colors.white,
+            title: Text("Categorias", style: TextStyle(color: Colors.black)),
+            content: Text("Nenhuma categoria disponível.",
+                style: TextStyle(color: Colors.grey)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text("OK"),
+                child: Text("OK", style: TextStyle(color: Colors.blueAccent)),
               ),
             ],
           );
@@ -87,12 +97,14 @@ class _TelaNovaTarefaState extends State<TelaNovaTarefa> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Selecione uma Categoria"),
+          backgroundColor: Colors.white,
+          title: Text("Selecione uma Categoria",
+              style: TextStyle(color: Colors.black)),
           content: SingleChildScrollView(
             child: ListBody(
               children: categoriasSalvas.map((categoria) {
                 return ListTile(
-                  title: Text(categoria),
+                  title: Text(categoria, style: TextStyle(color: Colors.black)),
                   onTap: () {
                     setState(() {
                       categoriaSelecionada = categoria;
@@ -153,14 +165,13 @@ class _TelaNovaTarefaState extends State<TelaNovaTarefa> {
       child: Container(
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color.fromARGB(255, 255, 255, 255),
           borderRadius: BorderRadius.circular(12),
         ),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Dias da semana em linha única com ajuste de tamanho
               Wrap(
                 alignment: WrapAlignment.center,
                 spacing: 4,
@@ -177,21 +188,23 @@ class _TelaNovaTarefaState extends State<TelaNovaTarefa> {
                     child: CircleAvatar(
                       radius: 16,
                       backgroundColor: selecionado
-                          ? const Color.fromARGB(255, 164, 151, 216)
-                          : Colors.grey,
+                          ? Colors.lightBlueAccent
+                          : Colors.grey[300],
                       child: Text(
                         dia,
-                        style: TextStyle(fontSize: 10),
+                        style: TextStyle(fontSize: 10, color: Colors.white),
                       ),
                     ),
                   );
                 }).toList(),
               ),
               SizedBox(height: 20),
-
               TextField(
                 controller: _tituloController,
-                decoration: InputDecoration(labelText: "Título"),
+                decoration: InputDecoration(
+                  labelText: "Título",
+                  labelStyle: TextStyle(color: Colors.blueAccent),
+                ),
               ),
               if (_mensagemErro != null)
                 Padding(
@@ -204,25 +217,27 @@ class _TelaNovaTarefaState extends State<TelaNovaTarefa> {
               SizedBox(height: 8),
               TextField(
                 controller: _descricaoController,
-                decoration: InputDecoration(labelText: "Descrição"),
+                decoration: InputDecoration(
+                  labelText: "Descrição",
+                  labelStyle: TextStyle(color: Colors.blueAccent),
+                ),
               ),
               SizedBox(height: 8),
               TextButton(
                 onPressed: selecionarCategoria,
-                child: Text("Selecionar Categoria: $categoriaSelecionada"),
+                child: Text("Selecionar Categoria: $categoriaSelecionada",
+                    style: TextStyle(color: Colors.blueAccent)),
               ),
               SizedBox(height: 20),
-
-              // Botões com ícones
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.cancel, color: Colors.red),
+                    icon: Icon(Icons.cancel, color: Colors.redAccent),
                     onPressed: () => Navigator.pop(context, null),
                   ),
                   IconButton(
-                    icon: Icon(Icons.access_time, color: Colors.blue),
+                    icon: Icon(Icons.access_time, color: Colors.blueAccent),
                     onPressed: () => selecionarHorario(context),
                   ),
                   IconButton(

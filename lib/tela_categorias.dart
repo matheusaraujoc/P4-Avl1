@@ -34,14 +34,10 @@ class _TelaCategoriasState extends State<TelaCategorias> {
   }
 
   Future<void> _removerCategorias() async {
-    // Remove as categorias selecionadas da lista de categorias
     categorias
         .removeWhere((categoria) => categoriasSelecionadas.contains(categoria));
     await prefs.setStringList('categorias', categorias);
-
-    // Remove as tarefas associadas às categorias selecionadas
     await _removerTarefasPorCategoriasSelecionadas();
-
     setState(() {
       categoriasSelecionadas.clear();
       emModoDeExclusao = false;
@@ -49,19 +45,14 @@ class _TelaCategoriasState extends State<TelaCategorias> {
   }
 
   Future<void> _removerTarefasPorCategoriasSelecionadas() async {
-    // Carrega as tarefas do SharedPreferences
     final String? tarefasJson = prefs.getString('tarefas');
     if (tarefasJson != null) {
       final List<dynamic> tarefasList = jsonDecode(tarefasJson);
-
-      // Filtra para manter apenas tarefas que não estão nas categorias selecionadas
       final List<Map<String, dynamic>> tarefasFiltradas = tarefasList
           .map((tarefa) => Map<String, dynamic>.from(tarefa))
           .where(
               (tarefa) => !categoriasSelecionadas.contains(tarefa['categoria']))
           .toList();
-
-      // Salva as tarefas filtradas de volta no SharedPreferences
       await prefs.setString('tarefas', jsonEncode(tarefasFiltradas));
     }
   }
@@ -79,7 +70,8 @@ class _TelaCategoriasState extends State<TelaCategorias> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Nova Categoria"),
+          title: Text("Nova Categoria",
+              style: TextStyle(color: Colors.lightBlueAccent)),
           content: TextField(
             controller: _categoriaController,
             decoration: InputDecoration(hintText: 'Digite o nome da categoria'),
@@ -87,7 +79,8 @@ class _TelaCategoriasState extends State<TelaCategorias> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("Cancelar"),
+              child:
+                  Text("Cancelar", style: TextStyle(color: Colors.redAccent)),
             ),
             TextButton(
               onPressed: () {
@@ -97,7 +90,8 @@ class _TelaCategoriasState extends State<TelaCategorias> {
                   Navigator.pop(context);
                 }
               },
-              child: Text("Adicionar"),
+              child: Text("Adicionar",
+                  style: TextStyle(color: Colors.lightBlueAccent)),
             ),
           ],
         );
@@ -110,18 +104,19 @@ class _TelaCategoriasState extends State<TelaCategorias> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Categorias"),
-        backgroundColor: const Color.fromARGB(255, 148, 132, 214),
-        automaticallyImplyLeading: false,
+        backgroundColor: Colors.lightBlueAccent,
         actions: [
           if (emModoDeExclusao)
             IconButton(
               icon: Icon(Icons.delete),
               onPressed: _removerCategorias,
+              color: Colors.redAccent,
             ),
           if (!emModoDeExclusao)
             IconButton(
-              icon: Icon(Icons.delete),
+              icon: Icon(Icons.delete_outline),
               onPressed: _alternarModoExclusao,
+              color: Colors.white,
             ),
           if (emModoDeExclusao)
             IconButton(
@@ -132,25 +127,37 @@ class _TelaCategoriasState extends State<TelaCategorias> {
                   categoriasSelecionadas.clear();
                 });
               },
+              color: Colors.redAccent,
             ),
           IconButton(
             icon: Icon(Icons.add),
             onPressed: _mostrarDialogNovaCategoria,
+            color: Colors.white,
           ),
         ],
       ),
       body: categorias.isEmpty
-          ? Center(child: Text("Nenhuma categoria disponível"))
+          ? Center(
+              child: Text("Nenhuma categoria disponível",
+                  style: TextStyle(color: Colors.lightBlueAccent)))
           : ListView.builder(
               padding: const EdgeInsets.all(16.0),
               itemCount: categorias.length,
               itemBuilder: (context, index) {
                 final categoria = categorias[index];
                 return Card(
-                  color: const Color.fromARGB(255, 190, 174, 255),
+                  color: Colors.blue[100],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(color: Colors.blueAccent),
+                  ),
                   margin: const EdgeInsets.symmetric(vertical: 8.0),
                   child: ListTile(
-                    title: Text(categoria),
+                    title: Text(
+                      categoria,
+                      style: TextStyle(
+                          color: Colors.blue[800], fontWeight: FontWeight.bold),
+                    ),
                     onTap: () {
                       if (emModoDeExclusao) {
                         setState(() {
@@ -164,9 +171,8 @@ class _TelaCategoriasState extends State<TelaCategorias> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => TelaCategoriaTarefas(
-                              categoria: categoria,
-                            ),
+                            builder: (context) =>
+                                TelaCategoriaTarefas(categoria: categoria),
                           ),
                         );
                       }
@@ -183,6 +189,7 @@ class _TelaCategoriasState extends State<TelaCategorias> {
                                 }
                               });
                             },
+                            activeColor: Colors.lightBlueAccent,
                           )
                         : null,
                   ),
@@ -191,6 +198,8 @@ class _TelaCategoriasState extends State<TelaCategorias> {
             ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 1,
+        selectedItemColor: Colors.lightBlueAccent,
+        unselectedItemColor: Colors.grey,
         onTap: (int index) {
           if (index == 0) {
             Navigator.pop(context);
